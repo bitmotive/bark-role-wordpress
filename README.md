@@ -1,16 +1,12 @@
 BARK: WORDPRESS
 =========
 
-WIP - Work In Progress
+WORK IN PROGRESS
 
 Requirements
 ------------
 
-All roles in the Bitmotive Ansible Role Kit are configuration driven.
-
-Customize this role by providing environment variables in either your
-shell environment, host specific in group_vars/, or at the CLI when
-prompted at runtime. 
+WORK IN PROGRESS
 
 Role Variables
 --------------
@@ -20,7 +16,7 @@ WORK IN PROGRESS
 Dependencies
 ------------
 
-None known at the time, but only tested on Debian/Ubuntu machines.
+WORK IN PROGRESS
 
 License
 -------
