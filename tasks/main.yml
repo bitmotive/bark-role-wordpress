@@ -44,53 +44,52 @@
   become: yes
 
 # Step 3: Checkout the latest version of WordPress and place it in /var/www/wordpress
-#- name: Ensure wget is present (to download WordPress)
-#  apt:
-#    name: wget
-#    state: present
-#  become: yes
-#
-#- name: Download the latest WordPress tarball
-#  get_url:
-#    url: "https://wordpress.org/latest.tar.gz"
-#    dest: "/tmp/wordpress-latest.tar.gz"
-#    timeout: 600
-#
-#- name: Unarchive WordPress tarball to the target directory
-#  unarchive:
-#    src: "/tmp/wordpress-latest.tar.gz"
-#    dest: "/var/www/"
-#    remote_src: yes
-#    creates: "/var/www/wordpress/wp-config-sample.php"  # This ensures the task is idempotent.
-#  become: yes
-#
+- name: Ensure wget is present (to download WordPress)
+  apt:
+    name: wget
+    state: present
+  become: yes
+
+- name: Download the latest WordPress tarball
+  get_url:
+    url: "https://wordpress.org/latest.tar.gz"
+    dest: "/tmp/wordpress-latest.tar.gz"
+    timeout: 600
+
+- name: Unarchive WordPress tarball to the target directory
+  unarchive:
+    src: "/tmp/wordpress-latest.tar.gz"
+    dest: "/var/www/"
+    remote_src: yes
+    creates: "/var/www/wordpress/wp-config-sample.php"  # This ensures the task is idempotent.
+  become: yes
+
 ## Optional: You might want to set the proper permissions on the WordPress directory
-#- name: Set proper permissions for WordPress directory
-#  file:
-#    path: "/var/www/wordpress"
-#    state: directory
-#    owner: www-data
-#    group: www-data
-#    recurse: yes
-#  become: yes
-#
-#- name: Add WordPress info site configuration
-#  copy:
-#    src: wordpress.conf
-#    dest: /etc/nginx/sites-available/
-#    mode: '0644'
-#
-#- name: Enable WP install site
-#  file:
-#    src: /etc/nginx/sites-available/wordpress.conf
-#    dest: /etc/nginx/sites-enabled/default
-#    state: link
-#
-#- name: Restart nginx and php-fpm to apply changes
-#  service:
-#    name: "{{ item }}"
-#    state: restarted
-#  loop:
-#    - nginx
-#    - php8.1-fpm
-#
+- name: Set proper permissions for WordPress directory
+  file:
+    path: "/var/www/wordpress"
+    state: directory
+    owner: www-data
+    group: www-data
+    recurse: yes
+  become: yes
+
+- name: Add WordPress info site configuration
+  copy:
+    src: wordpress.conf
+    dest: /etc/nginx/sites-available/
+    mode: '0644'
+
+- name: Enable WP install site
+  file:
+    src: /etc/nginx/sites-available/wordpress.conf
+    dest: /etc/nginx/sites-enabled/default
+    state: link
+
+- name: Restart nginx and php-fpm to apply changes
+  service:
+    name: "{{ item }}"
+    state: restarted
+  loop:
+    - nginx
+    - php8.1-fpm
