@@ -12,36 +12,47 @@ prompted at runtime.
 ## Role Variables
 
 **WORDPRESS_MYSQL_ROOT_PASSWORD**:
+
 The root password for the MySQL database used by WordPress.
 
 **WORDPRESS_DB_NAME**:
+
 The name of the WordPress database.
 
 **WORDPRESS_DB_USER**:
+
 The username for the WordPress database user.
 
 **WORDPRESS_DB_USER_PASSWORD**:
+
 The password for the WordPress database user.
 
 **WORDPRESS_SERVER_ROOT**:
+
 The root directory where WordPress files will be stored on the server.
 
 **WORDPRESS_NGINX_HOSTNAME**:
+
 The hostname for the Nginx server.
 
 **WORDPRESS_NGINX_PORT**:
+
 The port number on which Nginx will listen for WordPress traffic.
 
 **WORDPRESS_NGINX_SSL_ON**:
+
 Whether SSL should be enabled for the Nginx server (YES/NO).
 
 **WORDPRESS_NGINX_PUBKEY**:
+
 The path to the SSL public key file for Nginx.
 
 **WORDPRESS_NGINX_PRIVKEY**:
+
 The path to the SSL private key file for Nginx.
 
 **WORDPRESS_REDIRECT_WWW**:
+
 Whether to redirect www subdomain to non-www domain or vice versa (YES/NO).
 
 ## Dependencies
