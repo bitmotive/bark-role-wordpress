@@ -1,55 +1,204 @@
 ---
+# ROLE: WORDPRESS
+#
+# DESCRIPTION:
+# This playbook sets up a WordPress installation with MySQL database
 
-# Setup this role by prompting the user to enter required details
+###############################################################################
+################### VARIABLE INITIALIZATION & TASK SETUP ######################
+###############################################################################
 
-- name: Prompt for database root user password
-  pause:
-    prompt: "Database Root User Password"
-    echo: yes
-  register: input1
-
-- name: Set database_name fact
+# WORDPRESS_SERVER_ROOT
+# MySQL root user password
+- name: WORDPRESS_SERVER_ROOT set fact from env if possible
   set_fact:
-    mysql_root_password: "{{ input1.user_input }}"
-
-- name: Prompt for db user scribe password
+    WORDPRESS_SERVER_ROOT: "{{ lookup('env', 'WORDPRESS_SERVER_ROOT') }}"
+  when: lookup('env', 'WORDPRESS_SERVER_ROOT') | default('', true) | trim != ''
+- name: WORDPRESS_SERVER_ROOT prompt user input if unset
   pause:
-    prompt: "Database User 'scribe' Password"
+    prompt: "SET WORDPRESS_SERVER_ROOT"
     echo: yes
-  register: input2
-
-- name: Set database_name fact
+  register: input
+  when: WORDPRESS_SERVER_ROOT is not defined
+- name: WORDPRESS_SERVER_ROOT set fact from user input
   set_fact:
-    db_user_scribe_password: "{{ input2.user_input }}"
+    WORDPRESS_SERVER_ROOT: "{{ input.user_input }}"
+  when: WORDPRESS_SERVER_ROOT is not defined
 
-# Step 1: Create MySQL Database
+# WORDPRESS_DB_NAME
+# MySQL root user password
+- name: WORDPRESS_DB_NAME set fact from env if possible
+  set_fact:
+    WORDPRESS_DB_NAME: "{{ lookup('env', 'WORDPRESS_DB_NAME') }}"
+  when: lookup('env', 'WORDPRESS_DB_NAME') | default('', true) | trim != ''
+- name: WORDPRESS_DB_NAME prompt user input if unset
+  pause:
+    prompt: "SET WORDPRESS_DB_NAME"
+    echo: yes
+  register: input
+  when: WORDPRESS_DB_NAME is not defined
+- name: WORDPRESS_DB_NAME set fact from user input
+  set_fact:
+    WORDPRESS_DB_NAME: "{{ input.user_input }}"
+  when: WORDPRESS_DB_NAME is not defined
+
+# WORDPRESS_DB_USER
+# MySQL root user password
+- name: WORDPRESS_DB_USER set fact from env if possible
+  set_fact:
+    WORDPRESS_DB_USER: "{{ lookup('env', 'WORDPRESS_DB_USER') }}"
+  when: lookup('env', 'WORDPRESS_DB_USER') | default('', true) | trim != ''
+- name: WORDPRESS_DB_USER prompt user input if unset
+  pause:
+    prompt: "SET WORDPRESS_DB_USER"
+    echo: yes
+  register: input
+  when: WORDPRESS_DB_USER is not defined
+- name: WORDPRESS_DB_USER set fact from user input
+  set_fact:
+    WORDPRESS_DB_USER: "{{ input.user_input }}"
+  when: WORDPRESS_DB_USER is not defined
+
+# WORDPRESS_MYSQL_ROOT_PASSWORD
+# MySQL root user password
+- name: WORDPRESS_MYSQL_ROOT_PASSWORD set fact from env if possible
+  set_fact:
+    WORDPRESS_MYSQL_ROOT_PASSWORD: "{{ lookup('env', 'WORDPRESS_MYSQL_ROOT_PASSWORD') }}"
+  when: lookup('env', 'WORDPRESS_MYSQL_ROOT_PASSWORD') | default('', true) | trim != ''
+- name: WORDPRESS_MYSQL_ROOT_PASSWORD prompt user input if unset
+  pause:
+    prompt: "SET WORDPRESS_MYSQL_ROOT_PASSWORD"
+    echo: yes
+  register: input
+  when: WORDPRESS_MYSQL_ROOT_PASSWORD is not defined
+- name: WORDPRESS_MYSQL_ROOT_PASSWORD set fact from user input
+  set_fact:
+    WORDPRESS_MYSQL_ROOT_PASSWORD: "{{ input.user_input }}"
+  when: WORDPRESS_MYSQL_ROOT_PASSWORD is not defined
+
+# WORDPRESS_DB_USER_PASSWORD
+# Password for WordPress database user 'wpscribe'
+- name: WORDPRESS_DB_USER_PASSWORD set fact from env if possible
+  set_fact:
+    WORDPRESS_DB_USER_PASSWORD: "{{ lookup('env', 'WORDPRESS_DB_USER_PASSWORD') }}"
+  when: lookup('env', 'WORDPRESS_DB_USER_PASSWORD') | default('', true) | trim != ''
+- name: WORDPRESS_DB_USER_PASSWORD prompt user input if unset
+  pause:
+    prompt: "SET WORDPRESS_DB_USER_PASSWORD"
+    echo: yes
+  register: input
+  when: WORDPRESS_DB_USER_PASSWORD is not defined
+- name: WORDPRESS_DB_USER_PASSWORD set fact from user input
+  set_fact:
+    WORDPRESS_DB_USER_PASSWORD: "{{ input.user_input }}"
+  when: WORDPRESS_DB_USER_PASSWORD is not defined
+
+# WORDPRESS_NGINX_HOSTNAME
+# Hostname for the WordPress site
+- name: WORDPRESS_NGINX_HOSTNAME set fact from env if possible
+  set_fact:
+    WORDPRESS_NGINX_HOSTNAME: "{{ lookup('env', 'WORDPRESS_NGINX_HOSTNAME') }}"
+  when: lookup('env', 'WORDPRESS_NGINX_HOSTNAME') | default('', true) | trim != ''
+- name: WORDPRESS_NGINX_HOSTNAME prompt user input if unset
+  pause:
+    prompt: "SET WORDPRESS_NGINX_HOSTNAME"
+    echo: yes
+  register: input
+  when: WORDPRESS_NGINX_HOSTNAME is not defined
+- name: WORDPRESS_NGINX_HOSTNAME set fact from user input
+  set_fact:
+    WORDPRESS_NGINX_HOSTNAME: "{{ input.user_input }}"
+  when: WORDPRESS_NGINX_HOSTNAME is not defined
+
+# WORDPRESS_NGINX_PORT
+# Port for Nginx to listen on
+- name: WORDPRESS_NGINX_PORT set fact from env if possible
+  set_fact:
+    WORDPRESS_NGINX_PORT: "{{ lookup('env', 'WORDPRESS_NGINX_PORT') }}"
+  when: lookup('env', 'WORDPRESS_NGINX_PORT') | default('', true) | trim != ''
+- name: WORDPRESS_NGINX_PORT prompt user input if unset
+  pause:
+    prompt: "SET WORDPRESS_NGINX_PORT"
+    echo: yes
+  register: input
+  when: WORDPRESS_NGINX_PORT is not defined
+- name: WORDPRESS_NGINX_PORT set fact from user input
+  set_fact:
+    WORDPRESS_NGINX_PORT: "{{ input.user_input }}"
+  when: WORDPRESS_NGINX_PORT is not defined
+
+# WORDPRESS_NGINX_SSL_ON
+# Whether to enable SSL for Nginx
+- name: WORDPRESS_NGINX_SSL_ON set fact from env if possible
+  set_fact:
+    WORDPRESS_NGINX_SSL_ON: "{{ lookup('env', 'WORDPRESS_NGINX_SSL_ON') }}"
+  when: lookup('env', 'WORDPRESS_NGINX_SSL_ON') | default('', true) | trim != ''
+
+# WORDPRESS_NGINX_PUBKEY
+# Path to SSL public key for Nginx
+- name: WORDPRESS_NGINX_PUBKEY set fact from env if possible
+  set_fact:
+    WORDPRESS_NGINX_PUBKEY: "{{ lookup('env', 'WORDPRESS_NGINX_PUBKEY') }}"
+  when: lookup('env', 'WORDPRESS_NGINX_PUBKEY') | default('', true) | trim != ''
+
+# WORDPRESS_NGINX_PRIVKEY
+# Path to SSL private key for Nginx
+- name: WORDPRESS_NGINX_PRIVKEY set fact from env if possible
+  set_fact:
+    WORDPRESS_NGINX_PRIVKEY: "{{ lookup('env', 'WORDPRESS_NGINX_PRIVKEY') }}"
+  when: lookup('env', 'WORDPRESS_NGINX_PRIVKEY') | default('', true) | trim != ''
+
+# WORDPRESS_REDIRECT_WWW
+# Path to SSL private key for Nginx
+- name: WORDPRESS_REDIRECT_WWW set fact from env if possible
+  set_fact:
+    WORDPRESS_REDIRECT_WWW: "{{ lookup('env', 'WORDPRESS_REDIRECT_WWW') }}"
+  when: lookup('env', 'WORDPRESS_REDIRECT_WWW') | default('', true) | trim != ''
+
+###############################################################################
+############################ ROLE IMPLEMENTATION ##############################
+###############################################################################
+
+# Step 1: Ensure Python MySQL module is installed
+- name: Install required packages
+  apt:
+    name: 
+      - mysql-server
+      - mysql-client
+      - python3-mysqldb
+      - wget
+    state: present
+  become: yes
+
+- name: Start and enable MySQL service
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+  become: yes
+
+# Step 2: Create MySQL Database
 - name: Create 'wordpress' MySQL database
   mysql_db:
-    name: wordpress
+    name: "{{ WORDPRESS_DB_NAME }}"
     state: present
     login_user: root
-    login_password: "{{ mysql_root_password }}"
+    login_password: "{{ WORDPRESS_MYSQL_ROOT_PASSWORD }}"
   become: yes
  
-# Step 2: Create MySQL user account 'wpscribe' with full access to 'wordpress' db
-- name: Create 'wpscribe' user with all database privileges on 'wordpress' db
+# Step 3: Create MySQL user account 'wpscribe' with full access to 'wordpress' db
+- name: Create wp user with all database privileges on wordpress db
   mysql_user:
-    name: wpscribe
-    password: "{{ db_user_scribe_password }}"  # You should keep this in a secret or vault.
-    priv: "wordpress.*:ALL"
+    name: "{{ WORDPRESS_DB_USER }}"
+    password: "{{ WORDPRESS_DB_USER_PASSWORD }}"
+    priv: "{{ WORDPRESS_DB_NAME }}.*:ALL"
     host: "%"
     login_user: root
-    login_password: "{{ mysql_root_password }}"
+    login_password: "{{ WORDPRESS_MYSQL_ROOT_PASSWORD }}"
     state: present
   become: yes
 
-# Step 3: Checkout the latest version of WordPress and place it in /var/www/wordpress
-- name: Ensure wget is present (to download WordPress)
-  apt:
-    name: wget
-    state: present
-  become: yes
-
+# Step 4: Download and install WordPress
 - name: Download the latest WordPress tarball
   get_url:
     url: "https://wordpress.org/latest.tar.gz"
@@ -61,30 +210,52 @@
     src: "/tmp/wordpress-latest.tar.gz"
     dest: "/var/www/"
     remote_src: yes
-    creates: "/var/www/wordpress/wp-config-sample.php"  # This ensures the task is idempotent.
+    creates: "/var/www/wordpress/wp-config-sample.php"
   become: yes
 
-## Optional: You might want to set the proper permissions on the WordPress directory
 - name: Set proper permissions for WordPress directory
   file:
-    path: "/var/www/wordpress"
+    path: "{{ WORDPRESS_SERVER_ROOT }}"
     state: directory
     owner: www-data
     group: www-data
     recurse: yes
   become: yes
 
-- name: Add WordPress info site configuration
-  copy:
-    src: wordpress.conf
-    dest: /etc/nginx/sites-available/
-    mode: '0644'
+# Step 5: Configure Nginx for WordPress
 
-- name: Enable WP install site
+- name: Copy private key file to target
+  copy:
+    src: "{{ WORDPRESS_NGINX_PRIVKEY }}"
+    dest: /etc/ssl/private/ssl_{{ WORDPRESS_NGINX_HOSTNAME }}_privkey.pem
+  become: yes
+  when: WORDPRESS_NGINX_PRIVKEY != 'None'
+
+- name: Copy public key file to target
+  copy:
+    src: "{{ WORDPRESS_NGINX_PUBKEY }}"
+    dest: /etc/ssl/certs/ssl_{{ WORDPRESS_NGINX_HOSTNAME }}_fullchain.pem
+  become: yes
+  when: WORDPRESS_NGINX_PUBKEY != 'None'
+
+- name: Copy WordPress Nginx configuration
+  template:
+    src: wordpress.conf.j2
+    dest: /etc/nginx/sites-available/{{ WORDPRESS_NGINX_HOSTNAME }}.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+
+- name: Create symlink from sites-available to sites-enabled
   file:
-    src: /etc/nginx/sites-available/wordpress.conf
-    dest: /etc/nginx/sites-enabled/default
+    src: /etc/nginx/sites-available/{{ WORDPRESS_NGINX_HOSTNAME }}.conf
+    dest: /etc/nginx/sites-enabled/{{ WORDPRESS_NGINX_HOSTNAME }}.conf
     state: link
+    owner: www-data
+    group: www-data
+    mode: '0775'
+  become: yes
 
 - name: Restart nginx and php-fpm to apply changes
   service:
@@ -92,4 +263,3 @@
     state: restarted
   loop:
     - nginx
-    - php8.1-fpm
