@@ -26,10 +26,6 @@ server {
     }
 {% endif %}
 
-    location / {
-        try_files $uri /index.php;
-    }
-
     # unless the request is for a valid file, send to bootstrap
     if (!-e $request_filename)
     {
